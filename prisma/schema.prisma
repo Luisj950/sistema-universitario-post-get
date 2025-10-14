@@ -1,0 +1,94 @@
+// 1. Configuración del cliente y la base de datos
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // ¡Importante! Coincide con lo que pusimos en .env
+  url      = env("DATABASE_URL")
+}
+
+// 2. Definición de todos nuestros modelos (tablas)
+
+model Estudiante {
+  id_estudiante Int           @id @default(autoincrement())
+  nombre        String
+  apellido      String
+  email         String        @unique
+  inscripciones Inscripcion[]
+
+  @@map("Estudiantes")
+}
+
+model Carrera {
+  id_carrera     Int       @id @default(autoincrement())
+  nombre_carrera String
+  materias       Materia[]
+
+  @@map("Carreras")
+}
+
+model Profesor {
+  id_profesor Int      @id @default(autoincrement())
+  nombre      String
+  apellido    String
+  titulos     Titulo[]
+  cursos      Curso[]
+
+  @@map("Profesores")
+}
+
+model Titulo {
+  id_titulo     Int      @id @default(autoincrement())
+  nombre_titulo String
+  profesor      Profesor @relation(fields: [id_profesor], references: [id_profesor])
+  id_profesor   Int
+
+  @@map("Titulos")
+}
+
+model Aula {
+  id_aula     Int     @id @default(autoincrement())
+  numero_aula String
+  edificio    String?
+  cursos      Curso[]
+
+  @@map("Aulas")
+}
+
+model Materia {
+  id_materia     Int    @id @default(autoincrement())
+  nombre_materia String
+  codigo_materia String @unique
+  carrera        Carrera @relation(fields: [id_carrera], references: [id_carrera])
+  id_carrera     Int
+  cursos         Curso[]
+
+  @@map("Materias")
+}
+
+model Curso {
+  id_curso      Int           @id @default(autoincrement())
+  semestre      String?
+  anio          Int?
+  materia       Materia       @relation(fields: [id_materia], references: [id_materia])
+  id_materia    Int
+  profesor      Profesor      @relation(fields: [id_profesor], references: [id_profesor])
+  id_profesor   Int
+  aula          Aula          @relation(fields: [id_aula], references: [id_aula])
+  id_aula       Int
+  inscripciones Inscripcion[]
+
+  @@map("Cursos")
+}
+
+model Inscripcion {
+  id_inscripcion    Int      @id @default(autoincrement())
+  fecha_inscripcion DateTime @default(now())
+  estudiante        Estudiante @relation(fields: [id_estudiante], references: [id_estudiante])
+  id_estudiante     Int
+  curso             Curso      @relation(fields: [id_curso], references: [id_curso])
+  id_curso          Int
+
+  @@map("Inscripciones")
+}
