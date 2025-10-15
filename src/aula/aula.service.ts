@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AulaService {
+  constructor(private prisma: PrismaService) {}
+
   create(createAulaDto: CreateAulaDto) {
-    return 'This action adds a new aula';
+    return this.prisma.aula.create({
+      data: createAulaDto,
+    });
   }
 
   findAll() {
-    return `This action returns all aula`;
+    return this.prisma.aula.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} aula`;
+  async findOne(id: number) {
+    const aula = await this.prisma.aula.findUnique({
+      where: { id_aula: id },
+    });
+    if (!aula) {
+      throw new NotFoundException(`El aula con el ID #${id} no fue encontrada`);
+    }
+    return aula;
   }
 
-  update(id: number, updateAulaDto: UpdateAulaDto) {
-    return `This action updates a #${id} aula`;
+  // --- MÉTODO MEJORADO ---
+  async update(id: number, updateAulaDto: UpdateAulaDto) {
+    // 1. Primero, verifica que el aula exista.
+    // Si no existe, findOne() lanzará el error 404 y el código se detendrá aquí.
+    await this.findOne(id);
+
+    // 2. Si existe, procede a actualizarla.
+    return this.prisma.aula.update({
+      where: { id_aula: id },
+      data: updateAulaDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} aula`;
+  // --- MÉTODO MEJORADO ---
+  async remove(id: number) {
+    // 1. Primero, verifica que el aula exista.
+    await this.findOne(id);
+
+    // 2. Si existe, procede a eliminarla.
+    return this.prisma.aula.delete({
+      where: { id_aula: id },
+    });
   }
 }

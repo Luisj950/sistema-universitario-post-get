@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTituloDto } from './dto/create-titulo.dto';
 import { UpdateTituloDto } from './dto/update-titulo.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TituloService {
+  constructor(private prisma: PrismaService) {}
+
   create(createTituloDto: CreateTituloDto) {
-    return 'This action adds a new titulo';
+    return this.prisma.titulo.create({
+      data: createTituloDto,
+    });
   }
 
   findAll() {
-    return `This action returns all titulo`;
+    // Incluimos al profesor para saber a quién pertenece cada título
+    return this.prisma.titulo.findMany({
+      include: {
+        profesor: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} titulo`;
+  async findOne(id: number) {
+    const titulo = await this.prisma.titulo.findUnique({
+      where: { id_titulo: id },
+      include: {
+        profesor: true, // Corregido para incluir 'profesor'
+      },
+    });
+
+    if (!titulo) {
+      throw new NotFoundException(`Título con ID #${id} no encontrado`);
+    }
+    return titulo;
   }
 
-  update(id: number, updateTituloDto: UpdateTituloDto) {
-    return `This action updates a #${id} titulo`;
+  async update(id: number, updateTituloDto: UpdateTituloDto) {
+    await this.findOne(id); // Verifica si el título existe
+    return this.prisma.titulo.update({
+      where: { id_titulo: id },
+      data: updateTituloDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} titulo`;
+  async remove(id: number) {
+    await this.findOne(id); // Verifica si el título existe
+    return this.prisma.titulo.delete({
+      where: { id_titulo: id },
+    });
   }
 }

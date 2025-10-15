@@ -1,9 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { TituloService } from './titulo.service';
 import { CreateTituloDto } from './dto/create-titulo.dto';
 import { UpdateTituloDto } from './dto/update-titulo.dto';
 
-@Controller('titulo')
+@Controller('titulos') // Usamos el plural por convención REST
 export class TituloController {
   constructor(private readonly tituloService: TituloService) {}
 
@@ -18,17 +27,20 @@ export class TituloController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tituloService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.tituloService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTituloDto: UpdateTituloDto) {
-    return this.tituloService.update(+id, updateTituloDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTituloDto: UpdateTituloDto,
+  ) {
+    return this.tituloService.update(id, updateTituloDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tituloService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.tituloService.remove(id);
   }
 }

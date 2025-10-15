@@ -1,18 +1,34 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CarreraService } from './carrera.service';
+import { Injectable } from '@nestjs/common';
+import { CreateCarreraDto } from './dto/create-carrera.dto';
+import { UpdateCarreraDto } from './dto/update-carrera.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
-describe('CarreraService', () => {
-  let service: CarreraService;
+@Injectable()
+export class CarreraService {
+  constructor(private prisma: PrismaService) {}
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [CarreraService],
-    }).compile();
+  create(createCarreraDto: CreateCarreraDto) {
+    return this.prisma.carrera.create({
+      data: createCarreraDto,
+    });
+  }
 
-    service = module.get<CarreraService>(CarreraService);
-  });
+  findAll() {
+    return this.prisma.carrera.findMany();
+  }
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+  findOne(id: number) {
+    return this.prisma.carrera.findUnique({ where: { id_carrera: id } });
+  }
+
+  update(id: number, updateCarreraDto: UpdateCarreraDto) {
+    return this.prisma.carrera.update({
+      where: { id_carrera: id },
+      data: updateCarreraDto,
+    });
+  }
+
+  remove(id: number) {
+    return this.prisma.carrera.delete({ where: { id_carrera: id } });
+  }
+}
