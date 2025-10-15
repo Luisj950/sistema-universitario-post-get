@@ -16,13 +16,13 @@ export class CarreraService {
   // --- MÉTODO findAll CORREGIDO CON PAGINACIÓN ---
   async findAll(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
-    return this.prisma.carrera.findMany({ // Corregido para buscar en 'carrera'
+    return this.prisma.carrera.findMany({ 
       skip: skip,
       take: limit,
     });
   }
 
-  // --- findOne MEJORADO CON MANEJO DE ERRORES ---
+  
   async findOne(id: number) {
     const carrera = await this.prisma.carrera.findUnique({
       where: { id_carrera: id },
@@ -34,18 +34,18 @@ export class CarreraService {
     return carrera;
   }
 
-  // --- update MEJORADO CON MANEJO DE ERRORES ---
+
   async update(id: number, updateCarreraDto: UpdateCarreraDto) {
-    await this.findOne(id); // Verifica si existe
+    await this.findOne(id); 
     return this.prisma.carrera.update({
       where: { id_carrera: id },
       data: updateCarreraDto,
     });
   }
 
-  // --- remove MEJORADO CON MANEJO DE ERRORES ---
+ 
   async remove(id: number) {
-    await this.findOne(id); // Verifica si existe
+    await this.findOne(id); 
     return this.prisma.carrera.delete({
       where: { id_carrera: id },
     });

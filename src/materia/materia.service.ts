@@ -20,7 +20,7 @@ export class MateriaService {
       skip: skip,
       take: limit,
       include: {
-        carrera: true, // Mantenemos la info de la carrera relacionada
+        carrera: true, 
       },
     });
   }

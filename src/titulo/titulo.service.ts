@@ -20,7 +20,7 @@ export class TituloService {
       skip: skip,
       take: limit,
       include: {
-        profesor: true, // Mantenemos la info del profesor
+        profesor: true, 
       },
     });
   }

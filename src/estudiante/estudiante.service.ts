@@ -22,7 +22,7 @@ export class EstudianteService {
     });
   }
 
-  // --- findOne MEJORADO CON MANEJO DE ERRORES ---
+
   async findOne(id: number) {
     const estudiante = await this.prisma.estudiante.findUnique({
       where: { id_estudiante: id },
@@ -34,18 +34,18 @@ export class EstudianteService {
     return estudiante;
   }
 
-  // --- update MEJORADO CON MANEJO DE ERRORES ---
+ 
   async update(id: number, updateEstudianteDto: UpdateEstudianteDto) {
-    await this.findOne(id); // Verifica si el estudiante existe
+    await this.findOne(id); 
     return this.prisma.estudiante.update({
       where: { id_estudiante: id },
       data: updateEstudianteDto,
     });
   }
 
-  // --- remove MEJORADO CON MANEJO DE ERRORES ---
+  
   async remove(id: number) {
-    await this.findOne(id); // Verifica si el estudiante existe
+    await this.findOne(id); 
     return this.prisma.estudiante.delete({
       where: { id_estudiante: id },
     });

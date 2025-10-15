@@ -16,10 +16,10 @@ export class CursoService {
   // --- MÉTODO findAll CORREGIDO Y UNIFICADO CON PAGINACIÓN ---
   async findAll(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
-    return this.prisma.curso.findMany({ // Corregido para buscar en 'curso'
+    return this.prisma.curso.findMany({ 
       skip: skip,
       take: limit,
-      include: { // Mantenemos los includes para dar más contexto
+      include: { 
         materia: true,
         profesor: true,
         aula: true,
@@ -44,7 +44,7 @@ export class CursoService {
   }
 
   async update(id: number, updateCursoDto: UpdateCursoDto) {
-    await this.findOne(id); // Verifica si existe
+    await this.findOne(id); 
     return this.prisma.curso.update({
       where: { id_curso: id },
       data: updateCursoDto,
@@ -52,7 +52,7 @@ export class CursoService {
   }
 
   async remove(id: number) {
-    await this.findOne(id); // Verifica si existe
+    await this.findOne(id); 
     return this.prisma.curso.delete({
       where: { id_curso: id },
     });
