@@ -24,6 +24,8 @@
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Sistema de gestion universitario 
+
 
 ## Project setup
 
