@@ -13,9 +13,12 @@ export class InscripcionService {
     });
   }
 
-  findAll() {
-    // Incluimos los datos del estudiante y del curso para que la respuesta sea más útil
+  // --- MÉTODO findAll CORREGIDO CON PAGINACIÓN ---
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
     return this.prisma.inscripcion.findMany({
+      skip: skip,
+      take: limit,
       include: {
         estudiante: true,
         curso: true,
@@ -39,7 +42,7 @@ export class InscripcionService {
   }
 
   async update(id: number, updateInscripcionDto: UpdateInscripcionDto) {
-    await this.findOne(id); 
+    await this.findOne(id);
     return this.prisma.inscripcion.update({
       where: { id_inscripcion: id },
       data: updateInscripcionDto,
@@ -47,7 +50,7 @@ export class InscripcionService {
   }
 
   async remove(id: number) {
-    await this.findOne(id); 
+    await this.findOne(id);
     return this.prisma.inscripcion.delete({
       where: { id_inscripcion: id },
     });

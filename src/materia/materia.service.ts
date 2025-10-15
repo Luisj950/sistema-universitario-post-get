@@ -1,30 +1,30 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMateriaDto } from './dto/create-materia.dto';
 import { UpdateMateriaDto } from './dto/update-materia.dto';
-import { PrismaService } from '../prisma/prisma.service'; // 1. Importa PrismaService
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class MateriaService {
-  // 2. Inyecta PrismaService en el constructor
   constructor(private prisma: PrismaService) {}
 
-  // 3. Implementa la lógica real para crear una materia
   create(createMateriaDto: CreateMateriaDto) {
     return this.prisma.materia.create({
       data: createMateriaDto,
     });
   }
 
-  // 4. Implementa la lógica para encontrar todas las materias
-  findAll() {
+  // --- MÉTODO findAll CORREGIDO CON PAGINACIÓN ---
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
     return this.prisma.materia.findMany({
+      skip: skip,
+      take: limit,
       include: {
-        carrera: true, // Incluye la información de la carrera relacionada
+        carrera: true, // Mantenemos la info de la carrera relacionada
       },
     });
   }
 
-  // 5. Implementa la lógica para encontrar una materia por ID
   async findOne(id: number) {
     const materia = await this.prisma.materia.findUnique({
       where: { id_materia: id },
@@ -39,16 +39,14 @@ export class MateriaService {
     return materia;
   }
 
-  // Lógica para actualizar (opcional)
   async update(id: number, updateMateriaDto: UpdateMateriaDto) {
-    await this.findOne(id); // Reutiliza findOne para verificar si existe
+    await this.findOne(id);
     return this.prisma.materia.update({
       where: { id_materia: id },
       data: updateMateriaDto,
     });
   }
 
-  // Lógica para eliminar (opcional)
   async remove(id: number) {
     await this.findOne(id);
     return this.prisma.materia.delete({

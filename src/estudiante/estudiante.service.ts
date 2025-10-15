@@ -1,42 +1,53 @@
-// src/estudiante/estudiante.service.ts
-
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
-import { PrismaService } from '../prisma/prisma.service'; // <-- Ruta corregida
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class EstudianteService {
-  // Inyecta el servicio en el constructor
   constructor(private prisma: PrismaService) {}
 
   create(createEstudianteDto: CreateEstudianteDto) {
-    // Map DTO to Prisma input
-    const data = {
-     
-      ...createEstudianteDto
-    };
     return this.prisma.estudiante.create({
-      data,
+      data: createEstudianteDto,
     });
   }
 
-  findAll() {
-    return this.prisma.estudiante.findMany();
+  // --- MÉTODO findAll CORREGIDO CON PAGINACIÓN ---
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    return this.prisma.estudiante.findMany({
+      skip: skip,
+      take: limit,
+    });
   }
 
-  findOne(id: number) {
-    return this.prisma.estudiante.findUnique({ where: { id_estudiante: id } });
+  // --- findOne MEJORADO CON MANEJO DE ERRORES ---
+  async findOne(id: number) {
+    const estudiante = await this.prisma.estudiante.findUnique({
+      where: { id_estudiante: id },
+    });
+
+    if (!estudiante) {
+      throw new NotFoundException(`Estudiante con ID #${id} no encontrado`);
+    }
+    return estudiante;
   }
 
-  update(id: number, updateEstudianteDto: UpdateEstudianteDto) {
+  // --- update MEJORADO CON MANEJO DE ERRORES ---
+  async update(id: number, updateEstudianteDto: UpdateEstudianteDto) {
+    await this.findOne(id); // Verifica si el estudiante existe
     return this.prisma.estudiante.update({
       where: { id_estudiante: id },
       data: updateEstudianteDto,
     });
   }
 
-  remove(id: number) {
-    return this.prisma.estudiante.delete({ where: { id_estudiante: id } });
+  // --- remove MEJORADO CON MANEJO DE ERRORES ---
+  async remove(id: number) {
+    await this.findOne(id); // Verifica si el estudiante existe
+    return this.prisma.estudiante.delete({
+      where: { id_estudiante: id },
+    });
   }
 }

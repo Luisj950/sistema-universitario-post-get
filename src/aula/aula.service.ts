@@ -13,8 +13,14 @@ export class AulaService {
     });
   }
 
-  findAll() {
-    return this.prisma.aula.findMany();
+  // --- MÉTODO findAll CORREGIDO CON PAGINACIÓN ---
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    // Corregido para buscar en 'aula' en lugar de 'carrera'
+    return this.prisma.aula.findMany({ 
+      skip: skip,
+      take: limit,
+    });
   }
 
   async findOne(id: number) {
@@ -27,25 +33,16 @@ export class AulaService {
     return aula;
   }
 
-  // --- MÉTODO MEJORADO ---
   async update(id: number, updateAulaDto: UpdateAulaDto) {
-    // 1. Primero, verifica que el aula exista.
-    // Si no existe, findOne() lanzará el error 404 y el código se detendrá aquí.
     await this.findOne(id);
-
-    // 2. Si existe, procede a actualizarla.
     return this.prisma.aula.update({
       where: { id_aula: id },
       data: updateAulaDto,
     });
   }
 
-  // --- MÉTODO MEJORADO ---
   async remove(id: number) {
-    // 1. Primero, verifica que el aula exista.
     await this.findOne(id);
-
-    // 2. Si existe, procede a eliminarla.
     return this.prisma.aula.delete({
       where: { id_aula: id },
     });

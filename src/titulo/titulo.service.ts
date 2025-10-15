@@ -13,11 +13,14 @@ export class TituloService {
     });
   }
 
-  findAll() {
-    // Incluimos al profesor para saber a quién pertenece cada título
+  // --- MÉTODO findAll CORREGIDO CON PAGINACIÓN ---
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
     return this.prisma.titulo.findMany({
+      skip: skip,
+      take: limit,
       include: {
-        profesor: true,
+        profesor: true, // Mantenemos la info del profesor
       },
     });
   }
@@ -26,7 +29,7 @@ export class TituloService {
     const titulo = await this.prisma.titulo.findUnique({
       where: { id_titulo: id },
       include: {
-        profesor: true, // Corregido para incluir 'profesor'
+        profesor: true,
       },
     });
 
@@ -37,7 +40,7 @@ export class TituloService {
   }
 
   async update(id: number, updateTituloDto: UpdateTituloDto) {
-    await this.findOne(id); // Verifica si el título existe
+    await this.findOne(id);
     return this.prisma.titulo.update({
       where: { id_titulo: id },
       data: updateTituloDto,
@@ -45,7 +48,7 @@ export class TituloService {
   }
 
   async remove(id: number) {
-    await this.findOne(id); // Verifica si el título existe
+    await this.findOne(id);
     return this.prisma.titulo.delete({
       where: { id_titulo: id },
     });
