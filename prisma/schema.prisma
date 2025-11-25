@@ -1,0 +1,75 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  nombre    String
+  roles     String[] @default(["user"])
+}
+
+model Estudiante {
+  id            String        @id @default(cuid())
+  nombre        String
+  apellido      String
+  inscripciones Inscripcion[]
+}
+
+model Profesor {
+  id       String    @id @default(cuid())
+  nombre   String
+  apellido String
+  titulos  Titulo[]
+  materias Materia[]
+}
+
+model Titulo {
+  id         String   @id @default(cuid())
+  nombre     String
+  profesor   Profesor @relation(fields: [profesorId], references: [id])
+  profesorId String
+}
+
+model Carrera {
+  id       String    @id @default(cuid())
+  nombre   String    @unique
+  materias Materia[]
+}
+
+model Aula {
+  id       String    @id @default(cuid())
+  nombre   String    @unique
+  materias Materia[]
+}
+
+model Materia {
+  id            String        @id @default(cuid())
+  nombre        String
+  carrera       Carrera       @relation(fields: [carreraId], references: [id])
+  carreraId     String
+  profesor      Profesor      @relation(fields: [profesorId], references: [id])
+  profesorId    String
+  aula          Aula          @relation(fields: [aulaId], references: [id])
+  aulaId        String
+  inscripciones Inscripcion[]
+}
+
+model Inscripcion {
+  id           String   @id @default(cuid())
+  fecha        DateTime @default(now())
+  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
+  estudianteId String
+  materia      Materia    @relation(fields: [materiaId], references: [id])
+  materiaId    String
+
+  @@unique([estudianteId, materiaId])
+}
